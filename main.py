@@ -39,16 +39,25 @@ TEXT = (
 OUTPUT_PATH = os.environ.get("OUTPUT_PATH", "/output/entry.txt")
 
 
+def validate(text: str) -> list:
+    """Check the text against the bounty gate and the judge's brief.
+
+    Returns the two lines: the To: line and the message line.
+    """
+    lines = text.split("\n")
+    assert len(lines) == 2, "entry must be exactly two lines"
+    assert lines[0].startswith("To: "), "first line must be a To: line"
+    assert 1 <= len(text) <= 260, "entry must be 1 to 260 characters"
+    assert len(lines[1]) <= 200, "message line must be at most 200 characters"
+    assert text.strip(), "entry must not be only white space"
+    return lines
+
+
 def main() -> None:
     # Self-check against the bounty gate: UTF-8 text of 1 to 260
     # characters, not only white space; the message line at most 200
     # characters, per the judge's brief.
-    lines = TEXT.split("\n")
-    assert len(lines) == 2, "entry must be exactly two lines"
-    assert lines[0].startswith("To: "), "first line must be a To: line"
-    assert 1 <= len(TEXT) <= 260, "entry must be 1 to 260 characters"
-    assert len(lines[1]) <= 200, "message line must be at most 200 characters"
-    assert TEXT.strip(), "entry must not be only white space"
+    validate(TEXT)
 
     output_dir = os.path.dirname(OUTPUT_PATH)
     if output_dir:
